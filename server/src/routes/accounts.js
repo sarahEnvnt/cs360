@@ -26,13 +26,13 @@ router.get('/:id', async (req, res, next) => {
 // POST /api/accounts
 router.post('/', async (req, res, next) => {
   try {
-    const { name, nameAr, sector, ministry, summary, challenges, alliances, notes, status } = req.body;
+    const { name, nameAr, sector, ministry, summary, challenges, alliances, notes, status, assigneeId } = req.body;
     if (!name) throw new ApiError(400, 'Account name is required');
 
     const { rows } = await query(
-      `INSERT INTO accounts (name, name_ar, sector, ministry, summary, challenges, alliances, notes, status)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *`,
-      [name, nameAr || null, sector || null, ministry || null, summary || null, challenges || null, alliances || null, notes || null, status || 'active']
+      `INSERT INTO accounts (name, name_ar, sector, ministry, summary, challenges, alliances, notes, status, assignee_id)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *`,
+      [name, nameAr || null, sector || null, ministry || null, summary || null, challenges || null, alliances || null, notes || null, status || 'active', assigneeId || null]
     );
     const account = snakeToCamel(rows[0]);
     await logActivity(req.user.userId, account.id, 'create', 'account', account.id, req.body);
@@ -43,12 +43,12 @@ router.post('/', async (req, res, next) => {
 // PUT /api/accounts/:id
 router.put('/:id', async (req, res, next) => {
   try {
-    const { name, nameAr, sector, ministry, summary, challenges, alliances, notes, status } = req.body;
+    const { name, nameAr, sector, ministry, summary, challenges, alliances, notes, status, assigneeId } = req.body;
     const { rows } = await query(
       `UPDATE accounts SET name=COALESCE($1,name), name_ar=$2, sector=$3, ministry=$4,
-       summary=$5, challenges=$6, alliances=$7, notes=$8, status=COALESCE($9,status)
-       WHERE id=$10 RETURNING *`,
-      [name, nameAr, sector, ministry, summary, challenges, alliances, notes, status, req.params.id]
+       summary=$5, challenges=$6, alliances=$7, notes=$8, status=COALESCE($9,status), assignee_id=$10
+       WHERE id=$11 RETURNING *`,
+      [name, nameAr, sector, ministry, summary, challenges, alliances, notes, status, assigneeId || null, req.params.id]
     );
     if (!rows.length) throw new ApiError(404, 'Account not found');
     const account = snakeToCamel(rows[0]);

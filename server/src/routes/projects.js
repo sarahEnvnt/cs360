@@ -27,7 +27,7 @@ router.post('/:accountId/projects', async (req, res, next) => {
     const { rows } = await query(
       `INSERT INTO projects (account_id, name, type, status, budget, currency, timeframe, progress, probability, stakeholder, vendor, competitors, notes, start_date, end_date)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) RETURNING *`,
-      [acctId, name, type || null, status || 'pipeline', budget ? Number(budget) : 0, currency || 'SAR', timeframe || null,
+      [acctId, name, type || null, status || 'leads', budget ? Number(budget) : 0, currency || 'SAR', timeframe || null,
        progress != null && progress !== '' ? Number(progress) : null,
        probability != null && probability !== '' ? Number(probability) : null,
        stakeholder || null, vendor || null, competitors || null, notes || null, startDate || null, endDate || null]

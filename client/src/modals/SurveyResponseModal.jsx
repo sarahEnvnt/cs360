@@ -11,14 +11,7 @@ export default function SurveyResponseModal({ open, onClose, onSaved, accountId,
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (response) {
-      setForm({
-        ...response,
-        date: response.date ? response.date.slice(0, 10) : '',
-      });
-    } else {
-      setForm({});
-    }
+    setForm(response ? { ...response } : {});
     setError('');
   }, [response, open]);
 

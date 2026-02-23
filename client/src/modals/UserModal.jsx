@@ -8,7 +8,7 @@ import { T } from '../theme.js';
 const SCREENS = [
   { key: 'dashboard', label: 'Dashboard' },
   { key: 'accounts', label: 'Accounts' },
-  { key: 'surveys', label: 'Surveys & CSAT' },
+  { key: 'surveys', label: 'Surveys' },
   { key: 'reports', label: 'Reports' },
 ];
 

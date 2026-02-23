@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext.jsx';
 const nav = [
   { path: "/", icon: "\u25C6", label: "Executive Dashboard", permission: "dashboard" },
   { path: "/accounts", icon: "\u25C8", label: "Accounts", permission: "accounts" },
-  { path: "/surveys", icon: "\u2605", label: "Surveys & CSAT", permission: "surveys" },
+  { path: "/surveys", icon: "\u2605", label: "Surveys", permission: "surveys" },
   { path: "/reports", icon: "\u25C9", label: "Reports", permission: "reports" },
   { path: "/users", icon: "\u2660", label: "User Management", permission: "users", adminOnly: true },
 ];

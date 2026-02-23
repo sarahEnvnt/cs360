@@ -19,11 +19,11 @@ export default function ReportsPage() {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>
           <div style={{ padding: 16, background: T.ok + "10", borderRadius: 10, textAlign: "center" }}>
             <div style={{ fontSize: 24, fontWeight: 700, color: T.ok }}>{fmtNum(k.totalActiveRevenue)}</div>
-            <div style={{ fontSize: 11, color: T.textS }}>Active Revenue (SAR)</div>
+            <div style={{ fontSize: 11, color: T.textS }}>Active Projects (SAR)</div>
           </div>
           <div style={{ padding: 16, background: T.info + "10", borderRadius: 10, textAlign: "center" }}>
             <div style={{ fontSize: 24, fontWeight: 700, color: T.info }}>{fmtNum(k.totalPipeline)}</div>
-            <div style={{ fontSize: 11, color: T.textS }}>Pipeline (SAR)</div>
+            <div style={{ fontSize: 11, color: T.textS }}>Leads (SAR)</div>
           </div>
           <div style={{ padding: 16, background: T.accent + "10", borderRadius: 10, textAlign: "center" }}>
             <div style={{ fontSize: 24, fontWeight: 700, color: T.accent }}>{fmtNum((Number(k.totalActiveRevenue) || 0) + (Number(k.totalPipeline) || 0))}</div>
@@ -38,7 +38,7 @@ export default function ReportsPage() {
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
             <thead>
               <tr style={{ borderBottom: `1px solid ${T.border}` }}>
-                {["Account", "Health", "CSAT", "NPS", "Active", "Revenue", "Pipeline"].map(h => (
+                {["Account", "Health", "NPS", "Active", "Revenue", "Leads"].map(h => (
                   <th key={h} style={{ padding: "8px 10px", textAlign: "left", color: T.textS, fontWeight: 500, fontSize: 11 }}>{h}</th>
                 ))}
               </tr>
@@ -50,7 +50,6 @@ export default function ReportsPage() {
                   <tr key={a.id} style={{ borderBottom: `1px solid ${T.border}`, cursor: "pointer" }} onClick={() => navigate(`/accounts/${a.id}`)}>
                     <td style={{ padding: "10px", fontWeight: 600, color: T.text }}>{a.name}</td>
                     <td style={{ padding: "10px" }}><Badge color={h >= 80 ? T.ok : h >= 60 ? T.warn : T.err}>{h}%</Badge></td>
-                    <td style={{ padding: "10px", color: T.textS }}>{a.avgCsat != null ? a.avgCsat + "%" : "\u2014"}</td>
                     <td style={{ padding: "10px", color: T.textS }}>{a.npsScore != null ? a.npsScore : "\u2014"}</td>
                     <td style={{ padding: "10px", color: T.textS }}>{a.activeProjects || 0}</td>
                     <td style={{ padding: "10px", color: T.ok }}>{Number(a.activeRevenue) ? fmtNum(a.activeRevenue) : "\u2014"}</td>

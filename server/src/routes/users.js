@@ -6,6 +6,15 @@ import { ApiError } from '../helpers/ApiError.js';
 import { requireRole } from '../middleware/rbac.js';
 
 const router = Router();
+
+// Public (authenticated) endpoint — returns active user names for dropdowns
+router.get('/names', async (req, res, next) => {
+  try {
+    const { rows } = await query(`SELECT id, name FROM users WHERE is_active = true ORDER BY name`);
+    res.json(rows);
+  } catch (err) { next(err); }
+});
+
 router.use(requireRole('admin'));
 
 const COLS = 'id, email, name, role, permissions, is_active, created_at';

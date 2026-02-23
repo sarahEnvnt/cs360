@@ -43,11 +43,11 @@ export default function AccountsPage() {
                   </div>
                   <HealthRing value={h} size={56} sw={4} />
                 </div>
-                <div style={{ display: "flex", gap: 16, marginTop: 14, fontSize: 12, color: T.textS, flexWrap: "wrap" }}>
-                  {a.avgCsat != null && <span>😀 CSAT: {a.avgCsat}%</span>}
+                <div style={{ fontSize: 11, color: T.textS, marginTop: 10 }}>Assignee: <span style={{ color: a.assigneeName ? T.text : T.textS }}>{a.assigneeName || "Unassigned"}</span></div>
+                <div style={{ display: "flex", gap: 16, marginTop: 8, fontSize: 12, color: T.textS, flexWrap: "wrap" }}>
                   {a.npsScore != null && <span>📊 NPS: {a.npsScore}</span>}
-                  <span>💰 Revenue: {fmtNum(a.activeRevenue)}</span>
-                  <span>📈 Pipeline: {fmtNum(a.pipelineValue)}</span>
+                  <span>💰 Active Projects: {fmtNum(a.activeRevenue)}</span>
+                  <span>📈 Leads: {fmtNum(a.pipelineValue)}</span>
                 </div>
               </Card>
             );

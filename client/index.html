@@ -6,7 +6,12 @@
     <title>CS360 - Customer Success Platform</title>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { background: #080C14; transition: background .3s; }
     </style>
+    <script>
+      // Prevent flash: set body bg from saved theme before React loads
+      try { if (localStorage.getItem('cs360_theme') === 'light') document.body.style.background = '#F4F6F9'; } catch(e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

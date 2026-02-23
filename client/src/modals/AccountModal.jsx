@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { accountsApi } from '../api/accounts.js';
+import { usersApi } from '../api/users.js';
 import { Modal } from '../components/ui/Modal.jsx';
 import { Input } from '../components/ui/Input.jsx';
 import { Btn } from '../components/ui/Btn.jsx';
@@ -9,11 +10,16 @@ export default function AccountModal({ open, onClose, onSaved, account }) {
   const isEdit = !!account;
   const [form, setForm] = useState({});
   const [error, setError] = useState('');
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
     setForm(account ? { ...account } : {});
     setError('');
   }, [account, open]);
+
+  useEffect(() => {
+    if (open) usersApi.names().then(setUsers).catch(() => {});
+  }, [open]);
 
   const setF = (k, v) => setForm(prev => ({ ...prev, [k]: v }));
 
@@ -33,6 +39,7 @@ export default function AccountModal({ open, onClose, onSaved, account }) {
         <Input label="Sector" value={form.sector || ""} onChange={v => setF("sector", v)} options={["Government", "Banking", "Telecom", "Insurance", "Energy", "Healthcare", "Education", "Other"]} />
         <Input label="Parent Ministry/Org" value={form.ministry || ""} onChange={v => setF("ministry", v)} placeholder="e.g. Ministry of Interior" />
       </div>
+      <Input label="Assignee" value={form.assigneeId || ""} onChange={v => setF("assigneeId", v)} options={users.map(u => ({ value: u.id, label: u.name }))} />
       <Input label="Business Summary" value={form.summary || ""} onChange={v => setF("summary", v)} rows={3} placeholder="Brief description..." />
       <Input label="Key Challenges" value={form.challenges || ""} onChange={v => setF("challenges", v)} rows={2} />
       <Input label="Alliances (comma-separated)" value={form.alliances || ""} onChange={v => setF("alliances", v)} placeholder="e.g. PSS, Civil Defense" />

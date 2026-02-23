@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
+import { ThemeProvider, useTheme } from './context/ThemeContext.jsx';
 import { T } from './theme.js';
 import { AppLayout } from './components/layout/AppLayout.jsx';
 import LoginPage from './pages/LoginPage.jsx';
@@ -27,25 +28,34 @@ function PermissionRoute({ permission, adminOnly, children }) {
   return children;
 }
 
+function AppContent() {
+  useTheme(); // subscribe so all route elements get recreated on theme toggle
+  return (
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route element={<ProtectedRoute />}>
+        <Route element={<AppLayout />}>
+          <Route path="/" element={<PermissionRoute permission="dashboard"><DashboardPage /></PermissionRoute>} />
+          <Route path="/accounts" element={<PermissionRoute permission="accounts"><AccountsPage /></PermissionRoute>} />
+          <Route path="/accounts/:id" element={<PermissionRoute permission="accounts"><AccountDetailPage /></PermissionRoute>} />
+          <Route path="/surveys" element={<PermissionRoute permission="surveys"><SurveysPage /></PermissionRoute>} />
+          <Route path="/reports" element={<PermissionRoute permission="reports"><ReportsPage /></PermissionRoute>} />
+          <Route path="/users" element={<PermissionRoute permission="users" adminOnly><UserManagementPage /></PermissionRoute>} />
+        </Route>
+      </Route>
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
+
 export default function App() {
   return (
+    <ThemeProvider>
     <AuthProvider>
       <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route element={<ProtectedRoute />}>
-            <Route element={<AppLayout />}>
-              <Route path="/" element={<PermissionRoute permission="dashboard"><DashboardPage /></PermissionRoute>} />
-              <Route path="/accounts" element={<PermissionRoute permission="accounts"><AccountsPage /></PermissionRoute>} />
-              <Route path="/accounts/:id" element={<PermissionRoute permission="accounts"><AccountDetailPage /></PermissionRoute>} />
-              <Route path="/surveys" element={<PermissionRoute permission="surveys"><SurveysPage /></PermissionRoute>} />
-              <Route path="/reports" element={<PermissionRoute permission="reports"><ReportsPage /></PermissionRoute>} />
-              <Route path="/users" element={<PermissionRoute permission="users" adminOnly><UserManagementPage /></PermissionRoute>} />
-            </Route>
-          </Route>
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <AppContent />
       </BrowserRouter>
     </AuthProvider>
+    </ThemeProvider>
   );
 }

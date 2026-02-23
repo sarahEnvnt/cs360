@@ -21,10 +21,9 @@ export default function DashboardPage() {
       {/* KPI Row */}
       <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
         <StatBox icon="🏢" label="Total Accounts" value={k.totalAccounts || 0} sub={`${k.healthyAccounts || 0} healthy`} color={T.ok} />
-        <StatBox icon="💰" label="Active Revenue" value={fmtNum(k.totalActiveRevenue)} sub="SAR" />
-        <StatBox icon="🔮" label="Pipeline" value={fmtNum(k.totalPipeline)} sub="SAR" color={T.info} />
+        <StatBox icon="💰" label="Active Projects" value={fmtNum(k.totalActiveRevenue)} sub="SAR" />
+        <StatBox icon="🔮" label="Leads" value={fmtNum(k.totalPipeline)} sub="SAR" color={T.info} />
         <StatBox icon="📋" label="Active Projects" value={k.activeProjectsCount || 0} />
-        <StatBox icon="😀" label="Avg CSAT" value={k.overallAvgCsat ? k.overallAvgCsat + "%" : "N/A"} color={k.overallAvgCsat >= 80 ? T.ok : T.warn} />
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
@@ -78,18 +77,15 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      {/* CSAT Overview */}
-      {summary && summary.filter(a => a.avgCsat != null).length > 0 && (
+      {/* NPS Overview */}
+      {summary && summary.filter(a => a.npsScore != null).length > 0 && (
         <Card>
-          <h4 style={{ margin: "0 0 16px", fontSize: 14, fontWeight: 600, color: T.text }}>Satisfaction Scores by Account</h4>
+          <h4 style={{ margin: "0 0 16px", fontSize: 14, fontWeight: 600, color: T.text }}>NPS by Account</h4>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 12 }}>
-            {summary.filter(a => a.avgCsat != null || (Number(a.healthScore) || 0) > 0).map(a => (
+            {summary.filter(a => a.npsScore != null).map(a => (
               <div key={a.id} style={{ padding: 14, background: "rgba(255,255,255,.02)", borderRadius: 10, border: `1px solid ${T.border}` }}>
                 <div style={{ fontSize: 13, fontWeight: 600, color: T.text, marginBottom: 8 }}>{a.name}</div>
-                <div style={{ display: "flex", gap: 12 }}>
-                  {a.avgCsat != null && <div><div style={{ fontSize: 20, fontWeight: 700, color: a.avgCsat >= 80 ? T.ok : a.avgCsat >= 60 ? T.warn : T.err }}>{a.avgCsat}%</div><div style={{ fontSize: 10, color: T.textS }}>CSAT</div></div>}
-                  {a.npsScore != null && <div><div style={{ fontSize: 20, fontWeight: 700, color: a.npsScore >= 50 ? T.ok : a.npsScore >= 0 ? T.warn : T.err }}>{a.npsScore}</div><div style={{ fontSize: 10, color: T.textS }}>NPS</div></div>}
-                </div>
+                <div><div style={{ fontSize: 20, fontWeight: 700, color: a.npsScore >= 50 ? T.ok : a.npsScore >= 0 ? T.warn : T.err }}>{a.npsScore}</div><div style={{ fontSize: 10, color: T.textS }}>NPS</div></div>
               </div>
             ))}
           </div>
