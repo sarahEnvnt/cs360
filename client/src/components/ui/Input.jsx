@@ -1,3 +1,4 @@
+import { forwardRef } from 'react';
 import { T } from '../../theme.js';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -49,6 +50,28 @@ const datePickerOverrides = `
   border-color: var(--dp-text) !important;
 }
 .react-datepicker__triangle { display: none !important; }
+.react-datepicker__year-dropdown,
+.react-datepicker__month-dropdown {
+  background: var(--dp-bg) !important;
+  border: 1px solid var(--dp-border) !important;
+}
+.react-datepicker__year-option,
+.react-datepicker__month-option {
+  color: var(--dp-text) !important;
+}
+.react-datepicker__year-option:hover,
+.react-datepicker__month-option:hover {
+  background: var(--dp-hover) !important;
+}
+.react-datepicker__close-icon::after {
+  background-color: transparent !important;
+  color: #fff !important;
+  font-size: 16px !important;
+}
+.react-datepicker__close-icon:hover::after {
+  color: #C9A227 !important;
+}
+#dp-portal { position: relative; z-index: 9999; }
 `;
 
 let dpStyleInjected = false;
@@ -60,8 +83,20 @@ function ensureDatePickerStyles() {
   dpStyleInjected = true;
 }
 
-function setDPThemeVars(isDark) {
+function ensurePortalDiv() {
+  let el = document.getElementById('dp-portal');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'dp-portal';
+    document.body.appendChild(el);
+  }
+  return el;
+}
+
+function setDPThemeVars() {
   const root = document.documentElement;
+  // Detect dark mode from theme token colors
+  const isDark = T.bg === '#080C14' || T.bg === '#0B1120' || T.text === '#EAEDF3' || T.text === '#E2E8F0';
   if (isDark) {
     root.style.setProperty('--dp-bg', '#131925');
     root.style.setProperty('--dp-header-bg', '#0E1320');
@@ -77,13 +112,24 @@ function setDPThemeVars(isDark) {
   }
 }
 
+const DateInput = forwardRef(({ value, onClick, placeholder, baseStyle }, ref) => (
+  <input
+    ref={ref}
+    value={value || ''}
+    onClick={onClick}
+    placeholder={placeholder}
+    readOnly
+    style={{ ...baseStyle, cursor: "pointer" }}
+  />
+));
+
 export function Input({ label, value, onChange, type = "text", placeholder, options, rows, style, required }) {
   const base = { width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${T.border}`, background: T.bg, color: T.text, fontSize: 13, outline: "none", fontFamily: "inherit", boxSizing: "border-box" };
 
   if (type === "date") {
     ensureDatePickerStyles();
-    const isDark = T.bg === '#080C14' || T.bg === '#0B1120' || getComputedStyle(document.documentElement).getPropertyValue('--dp-bg') !== '#FFFFFF';
-    setDPThemeVars(document.documentElement.getAttribute('data-theme') === 'dark' || T.text === '#EAEDF3' || T.text === '#E2E8F0');
+    setDPThemeVars();
+    ensurePortalDiv();
 
     const parsed = value ? new Date(value + (value.length === 10 ? 'T00:00:00' : '')) : null;
     const selected = parsed && !isNaN(parsed.getTime()) ? parsed : null;
@@ -109,15 +155,13 @@ export function Input({ label, value, onChange, type = "text", placeholder, opti
           showMonthDropdown
           showYearDropdown
           dropdownMode="select"
-          customInput={
-            <input style={{ ...base, cursor: "pointer" }} readOnly />
-          }
+          portalId="dp-portal"
+          customInput={<DateInput baseStyle={base} placeholder={placeholder || "Select date..."} />}
         />
       </div>
     );
   }
 
-  const displayValue = value;
   return (
     <div style={{ marginBottom: 12, ...style }}>
       {label && <label style={{ display: "block", fontSize: 11, color: T.textS, marginBottom: 4, fontWeight: 500 }}>{label}{required && <span style={{ color: T.err }}> *</span>}</label>}
@@ -129,7 +173,7 @@ export function Input({ label, value, onChange, type = "text", placeholder, opti
       ) : rows ? (
         <textarea value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} rows={rows} style={{ ...base, resize: "vertical" }} />
       ) : (
-        <input type={type} value={displayValue} onChange={e => onChange(e.target.value)} placeholder={placeholder} style={base} />
+        <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} style={base} />
       )}
     </div>
   );
