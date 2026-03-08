@@ -21,7 +21,15 @@ import userRoutes from './routes/users.js';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 
-app.use(cors({ origin: env.CLIENT_ORIGIN }));
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow same-origin requests (no origin header) in production
+    if (!origin) return callback(null, true);
+    const allowed = env.CLIENT_ORIGIN;
+    if (origin === allowed) return callback(null, true);
+    callback(new Error('Not allowed by CORS'));
+  }
+}));
 app.use(express.json());
 if (env.NODE_ENV === 'development') app.use(morgan('dev'));
 
@@ -41,8 +49,6 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/activity-log', activityLogRoutes);
 app.use('/api/users', userRoutes);
 
-app.use(errorHandler);
-
 // Serve client build in production
 if (env.NODE_ENV === 'production') {
   const clientDist = resolve(__dirname, '../../client/dist');
@@ -51,6 +57,8 @@ if (env.NODE_ENV === 'production') {
     res.sendFile(resolve(clientDist, 'index.html'));
   });
 }
+
+app.use(errorHandler);
 
 app.listen(env.PORT, '0.0.0.0', () => {
   console.log(`CS360 API running on http://localhost:${env.PORT}`);
