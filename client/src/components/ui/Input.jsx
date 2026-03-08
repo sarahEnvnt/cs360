@@ -63,6 +63,22 @@ const datePickerOverrides = `
 .react-datepicker__month-option:hover {
   background: var(--dp-hover) !important;
 }
+.react-datepicker__month-dropdown-container select,
+.react-datepicker__year-dropdown-container select,
+.react-datepicker__month-dropdown-container--select select,
+.react-datepicker__year-dropdown-container--select select {
+  background: var(--dp-bg) !important;
+  color: var(--dp-text) !important;
+  border: 1px solid var(--dp-border) !important;
+  border-radius: 6px !important;
+  padding: 4px 8px !important;
+  font-size: 13px !important;
+  cursor: pointer !important;
+}
+.react-datepicker__month-dropdown-container--select,
+.react-datepicker__year-dropdown-container--select {
+  margin: 0 4px !important;
+}
 .react-datepicker__close-icon::after {
   background-color: transparent !important;
   color: #fff !important;
