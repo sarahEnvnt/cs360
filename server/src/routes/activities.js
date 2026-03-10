@@ -10,7 +10,7 @@ const router = Router();
 router.get('/:accountId/activities', async (req, res, next) => {
   try {
     const { rows } = await query(
-      'SELECT * FROM activities WHERE account_id = $1 ORDER BY date ASC NULLS LAST',
+      'SELECT * FROM activities WHERE account_id = $1 ORDER BY created_at DESC',
       [req.params.accountId]
     );
     res.json(rows.map(snakeToCamel));
