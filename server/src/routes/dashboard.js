@@ -34,7 +34,7 @@ router.get('/upcoming-activities', async (req, res, next) => {
     const { rows } = await query(
       `SELECT a.*, acc.name AS account_name FROM activities a
        JOIN accounts acc ON acc.id = a.account_id
-       WHERE a.status NOT IN ('done') ORDER BY a.date DESC NULLS LAST LIMIT 6`
+       WHERE a.status NOT IN ('done') ORDER BY a.created_at DESC LIMIT 6`
     );
     res.json(rows.map(snakeToCamel));
   } catch (err) { next(err); }
