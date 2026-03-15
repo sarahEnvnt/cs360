@@ -15,21 +15,40 @@ export default function AccountsPage() {
   const navigate = useNavigate();
   const { data: accounts, refresh } = useApi(() => dashboardApi.getSummary(), []);
   const [modal, setModal] = useState(null);
+  const [ownerFilter, setOwnerFilter] = useState('all');
 
   const handleSaved = () => { setModal(null); refresh(); };
 
+  const owners = [...new Set((accounts || []).map(a => a.assigneeName).filter(Boolean))].sort();
+  const filtered = ownerFilter === 'all' ? accounts : (accounts || []).filter(a => ownerFilter === 'unassigned' ? !a.assigneeName : a.assigneeName === ownerFilter);
+
+  const filterBtn = (label, value) => (
+    <button key={value} onClick={() => setOwnerFilter(value)} style={{
+      padding: "5px 12px", fontSize: 11, fontWeight: 500, borderRadius: 6, cursor: "pointer",
+      border: `1px solid ${ownerFilter === value ? T.accent : T.border}`,
+      background: ownerFilter === value ? T.accent + '18' : 'transparent',
+      color: ownerFilter === value ? T.accent : T.textS, fontFamily: "inherit", transition: "all .15s",
+    }}>{label}</button>
+  );
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div style={{ fontSize: 13, color: T.textS }}>{accounts?.length || 0} account(s)</div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
+        <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
+          <span style={{ fontSize: 13, color: T.textS }}>{filtered?.length || 0} account(s)</span>
+          <span style={{ borderLeft: `1px solid ${T.border}`, height: 16, margin: "0 4px" }} />
+          {filterBtn('All', 'all')}
+          {owners.map(o => filterBtn(o, o))}
+          {filterBtn('Unassigned', 'unassigned')}
+        </div>
         <Btn onClick={() => setModal('add')}>+ Add Account</Btn>
       </div>
 
-      {!accounts || accounts.length === 0 ? (
-        <EmptyState icon="🏢" message="No accounts yet. Start by adding your first account." action="+ Add Account" onAction={() => setModal('add')} />
+      {!filtered || filtered.length === 0 ? (
+        <EmptyState icon="🏢" message={ownerFilter === 'all' ? "No accounts yet. Start by adding your first account." : "No accounts match this filter."} action="+ Add Account" onAction={() => setModal('add')} />
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: 14 }}>
-          {accounts.map(a => {
+          {filtered.map(a => {
             const h = Number(a.healthScore) || 0;
             return (
               <Card key={a.id} hover onClick={() => navigate(`/accounts/${a.id}`)}>
