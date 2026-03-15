@@ -29,6 +29,8 @@ export default function AccountDetailPage() {
   const [tab, setTab] = useState('overview');
   const [modal, setModal] = useState(null);
   const [editItem, setEditItem] = useState(null);
+  const [projStatusFilter, setProjStatusFilter] = useState('all');
+  const [projTypeFilter, setProjTypeFilter] = useState('all');
 
   const { data: account, refresh: refreshAcct } = useApi(() => accountsApi.get(id), [id]);
   const { data: stakeholders, refresh: refreshStk } = useApi(() => stakeholdersApi.list(id), [id]);
@@ -290,14 +292,39 @@ export default function AccountDetailPage() {
       )}
 
       {/* PROJECTS */}
-      {tab === "projects" && (
+      {tab === "projects" && (() => {
+        const projectTypes = [...new Set((projects || []).map(p => p.type).filter(Boolean))];
+        const filtered = (projects || []).filter(p => {
+          if (projStatusFilter !== 'all' && p.status !== projStatusFilter) return false;
+          if (projTypeFilter !== 'all' && p.type !== projTypeFilter) return false;
+          return true;
+        });
+        const filterBtn = (label, value, current, setter) => (
+          <button key={value} onClick={() => setter(value)} style={{
+            padding: "5px 12px", fontSize: 11, fontWeight: 500, borderRadius: 6, cursor: "pointer",
+            border: `1px solid ${current === value ? T.accent : T.border}`,
+            background: current === value ? T.accent + '18' : 'transparent',
+            color: current === value ? T.accent : T.textS, fontFamily: "inherit", transition: "all .15s",
+          }}>{label}</button>
+        );
+        return (
         <div>
-          <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+              {filterBtn('All', 'all', projStatusFilter, setProjStatusFilter)}
+              {filterBtn('Active', 'active', projStatusFilter, setProjStatusFilter)}
+              {filterBtn('Leads', 'leads', projStatusFilter, setProjStatusFilter)}
+              {filterBtn('Exploration', 'exploration', projStatusFilter, setProjStatusFilter)}
+              {filterBtn('Completed', 'completed', projStatusFilter, setProjStatusFilter)}
+              {projectTypes.length > 1 && <span style={{ borderLeft: `1px solid ${T.border}`, margin: "0 4px" }} />}
+              {projectTypes.length > 1 && filterBtn('All Types', 'all', projTypeFilter, setProjTypeFilter)}
+              {projectTypes.length > 1 && projectTypes.map(t => filterBtn(t, t, projTypeFilter, setProjTypeFilter))}
+            </div>
             <Btn onClick={() => setModal('add-project')}>+ Add Project</Btn>
           </div>
-          {!projects?.length ? <EmptyState icon="📋" message="No projects yet." action="+ Add Project" onAction={() => setModal('add-project')} /> : (
+          {!filtered.length ? <EmptyState icon="📋" message="No projects match the filter." action="+ Add Project" onAction={() => setModal('add-project')} /> : (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {projects.map(p => (
+              {filtered.map(p => (
                 <Card key={p.id} hover>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                     <div>
@@ -347,7 +374,8 @@ export default function AccountDetailPage() {
             </div>
           )}
         </div>
-      )}
+        );
+      })()}
 
       {/* ACTIVITIES */}
       {tab === "activities" && (
